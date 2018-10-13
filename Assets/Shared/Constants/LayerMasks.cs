@@ -6,5 +6,7 @@
 public class LayerMasks
 {
 	public static readonly int entity = 1 << LayerMask.NameToLayer("Player");
-	public static readonly int artView = 1 << LayerMask.NameToLayer("Block");
+	public static readonly int tile = 1 << LayerMask.NameToLayer("Tile");
+
+    public static readonly int groundCheck = 1 << LayerMask.NameToLayer("Tile");
 }
