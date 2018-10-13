@@ -7,6 +7,7 @@ public class MainController : MonoBehaviour
 #region variables
 	public static MainController I;
 	
+	public PlayerView player;
 	public LevelGenerator generator;
 #endregion
 #region initialization
@@ -23,6 +24,7 @@ public class MainController : MonoBehaviour
 			
 		generator.Generate();
 		
+		player.transform.position = new Vector3(2,3);
 	}
 #endregion
 #region logic
