@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4512719845983794}
   - component: {fileID: 212702929107705738}
+  - component: {fileID: 114632299183123222}
   m_Layer: 0
   m_Name: New Sprite
   m_TagString: Untagged
@@ -96,6 +97,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &114632299183123222
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1550393623742700}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ae1263708cc061448f0faec92c52622, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distance: 0.1
+  interval: 0.1
 --- !u!114 &114799301447008132
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -107,6 +121,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4aa96614bb714dd5946a57aadb19114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fallSpeed: 10
+  jitter: {fileID: 114632299183123222}
+  rigidbody: {fileID: 0}
 --- !u!212 &212702929107705738
 SpriteRenderer:
   m_ObjectHideFlags: 1

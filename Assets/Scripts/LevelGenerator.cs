@@ -5,9 +5,20 @@ using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
 {
+	public class RoomView
+	{ //Hacks
+		public int index = 0;
+		public TileView[, ] tileTable;
+		public List<TileView> tiles = new List<TileView>();
+
+		public int width { get { return tileTable.GetLength(0); } }
+		public int height { get { return tileTable.GetLength(1); } }
+	}
+
 	#region variables
 	public static LevelGenerator I;
 
+	public List<RoomView> rooms = new List<RoomView>();
 	public TileView tilePrefab;
 	#endregion
 	#region initialization
@@ -26,19 +37,24 @@ public class LevelGenerator : MonoBehaviour
 		GenerateNextRoom("Base");
 	}
 
-    public void GenerateNextRoom()
-    {
-        GenerateNextRoom("Base");
-    }
-    #endregion
-    #region logic
-    #endregion
-    #region public interface
-	
+	public void GenerateNextRoom()
+	{
+		GenerateNextRoom("Base");
+	}
+	#endregion
+	#region logic
+	#endregion
+	#region public interface
+
+	int roomIndex = 0;
+
 	private void GenerateNextRoom(string roomType, bool randomRoom = true)
 	{
-        LevelDatabase.RoomData room;
-		
+		if (rooms.Count == 3)
+			rooms.RemoveAt(0);
+
+		LevelDatabase.RoomData room;
+
 		if (randomRoom)
 		{
 			int openingIndex = 1 << Helpers.Rand(3);
@@ -54,8 +70,12 @@ public class LevelGenerator : MonoBehaviour
 
 			room = LevelDatabase.I.GetRandomRoom(roomType, openingIndex);
 		}
-		else 
+		else
 			room = LevelDatabase.I.GetOnlyRoom(roomType);
+
+		var roomView = new RoomView();
+		roomView.index = roomIndex++;
+		roomView.tileTable = new TileView[room.width, room.height];
 
 		for (int i = 0; i < room.width; i++)
 		{
@@ -78,19 +98,30 @@ public class LevelGenerator : MonoBehaviour
 				if (room.data[i, j] == TileID.Wall)
 				{
 					var tile = Instantiate(tilePrefab, pos, Quaternion.identity);
+					roomView.tiles.Add(tile);
+					roomView.tileTable[i, j] = tile;
 				}
-
 			}
-
+		}
+		
+		//Steal top row from last room view.... Ugly as heck!
+		if (rooms.Count > 0)
+		{
+			var upperRoom = rooms[rooms.Count - 1];
+			for (int i = 1; i < upperRoom.width - 2; i++)
+			{
+				roomView.tileTable[i, roomView.height - 1] = upperRoom.tileTable[i, 0];
+			}
 		}
 
 		currentYPos += room.height - 1;
 		lastRoomData = room;
+		rooms.Add(roomView);
 	}
 
-    #endregion
-    #region private interface
-    #endregion
-    #region events
-    #endregion
+	#endregion
+	#region private interface
+	#endregion
+	#region events
+	#endregion
 }

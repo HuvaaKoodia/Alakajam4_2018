@@ -31,28 +31,33 @@ public class PlayerView : MonoBehaviour
 		float horizontalAxis = Input.GetAxisRaw("Horizontal");
 		bool jumped = Input.GetButtonDown("Jump");
 
-		if (!onGround && rigidbody.velocity.y <= 0)
-		{
-			var hitR = Physics2D.Raycast(transform.position + Vector3.right * 0.9f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
+		var hitR = Physics2D.Raycast(transform.position + Vector3.right * 0.4f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
 
-			var hitL = Physics2D.Raycast(transform.position + Vector3.left * 0.9f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
+		var hitL = Physics2D.Raycast(transform.position + Vector3.left * 0.40f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
 
 #if UNITY_EDITOR
-			Debug.DrawRay(transform.position, Vector2.down, Color.red, groundCheckDistance);
+		Debug.DrawRay(transform.position, Vector2.down, Color.red, groundCheckDistance);
 #endif
 
-			if (hitR || hitL)
+		if (hitR || hitL)
+		{
+			if (!onGround && rigidbody.velocity.y < 0)
 			{
 				onGround = true;
-				//rigidbody.sharedMaterial = groundFriction;
+				animator.SetBool("ilmabool", false);
 			}
+			//rigidbody.sharedMaterial = groundFriction;
+		}
+		else if (onGround)
+		{
+			onGround = false;
+			animator.SetBool("ilmabool", true);
 		}
 
 		if (onGround && jumped)
 		{
 			rigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-			onGround = false;
-			rigidbody.sharedMaterial = jumpFriction;
+			//rigidbody.sharedMaterial = jumpFriction;
 		}
 		var v = rigidbody.velocity;
 
