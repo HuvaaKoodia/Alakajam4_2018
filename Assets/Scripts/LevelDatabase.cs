@@ -28,6 +28,7 @@ public class LevelDatabase : MonoBehaviour
     public class RoomData
     {
         public TileID[,] data;
+        public int index;
         public int width { get { return data.GetLength(0); } }
         public int height { get { return data.GetLength(1); } }
     }
@@ -53,6 +54,18 @@ public class LevelDatabase : MonoBehaviour
         rooms = new Dictionary<string, List<RoomData>[]>();
 
         StartCoroutine(LoadWWW());
+    }
+
+    public RoomData GetOnlyRoom(string roomType)
+    {
+        var list = rooms[roomType];
+        
+        for (int i = 0; i < list.Length; i++)
+        {
+            if (list[i].Count > 0)
+            return list[i][0];
+        }
+        return null;
     }
 
     private void AddRoomType(string type)
@@ -160,6 +173,7 @@ public class LevelDatabase : MonoBehaviour
                     rooms[roomType][roomIndex].Add(currentRoom);
                     currentRoomType = roomType;
                     currentRoomIndex = roomIndex;
+                    currentRoom.index = roomIndex;
 
                     //calculate max height and width
                     roomMaxHeight = 0;
