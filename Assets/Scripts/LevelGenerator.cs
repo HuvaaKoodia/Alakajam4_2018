@@ -17,41 +17,46 @@ public class LevelGenerator : MonoBehaviour
 	}
 
 	int currentYPos = 0;
-	int lastRoomType = 0;
 	LevelDatabase.RoomData lastRoomData;
 
-	public void Generate()
+	public void GenerateStartRooms()
 	{
-		{
-			
-			GenerateNextRoom();
-		}
-
-		{
-			GenerateNextRoom();
-		}
-
-		{
-			GenerateNextRoom();
-		}
+		GenerateNextRoom("Start", false);
+		GenerateNextRoom("Base");
+		GenerateNextRoom("Base");
 	}
 
-	private void GenerateNextRoom()
+    public void GenerateNextRoom()
+    {
+        GenerateNextRoom("Base");
+    }
+    #endregion
+    #region logic
+    #endregion
+    #region public interface
+	
+	private void GenerateNextRoom(string roomType, bool randomRoom = true)
 	{
+        LevelDatabase.RoomData room;
 		
-		int type = Helpers.Rand(3);
-		if (lastRoomData != null)
+		if (randomRoom)
 		{
-			if (lastRoomType == 0)
-				type = Helpers.RandParam(1, 2); 
-			else if (lastRoomType == 1)
-				type = Helpers.RandParam(0, 2);
-			else if (lastRoomType == 2)
-				type = Helpers.RandParam(0, 1);
+			int openingIndex = 1 << Helpers.Rand(3);
+			if (lastRoomData != null)
+			{
+				if (lastRoomData.index == 1 << 0)
+					openingIndex = 1 << Helpers.RandParam(1, 2);
+				else if (lastRoomData.index == 1 << 1)
+					openingIndex = 1 << Helpers.RandParam(0, 2);
+				else if (lastRoomData.index == 1 << 2)
+					openingIndex = 1 << Helpers.RandParam(0, 1);
+			}
+
+			room = LevelDatabase.I.GetRandomRoom(roomType, openingIndex);
 		}
-		
-		var room = LevelDatabase.I.GetRandomRoom("Base", 1 << type);
-		
+		else 
+			room = LevelDatabase.I.GetOnlyRoom(roomType);
+
 		for (int i = 0; i < room.width; i++)
 		{
 			bool topCheckOn = false;
@@ -67,7 +72,7 @@ public class LevelGenerator : MonoBehaviour
 					else
 						topCheckOn = false;
 				}
-				
+
 				var pos = new Vector3(i, -currentYPos + j);
 
 				if (room.data[i, j] == TileID.Wall)
@@ -81,15 +86,11 @@ public class LevelGenerator : MonoBehaviour
 
 		currentYPos += room.height - 1;
 		lastRoomData = room;
-		lastRoomType = type;
 	}
-	#endregion
-	#region logic
-	#endregion
-	#region public interface
-	#endregion
-	#region private interface
-	#endregion
-	#region events
-	#endregion
+
+    #endregion
+    #region private interface
+    #endregion
+    #region events
+    #endregion
 }

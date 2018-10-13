@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
 
     float shakeIntensity = 0;
     float shakeDuration;
-    public Vector3 startPosition;
+    Vector3 startPosition, shakeStartPosition;
    
 
     void Awake()
@@ -21,7 +21,8 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        startPosition = shakeTransform.localPosition;
+        shakeStartPosition = shakeTransform.localPosition;
+        startPosition = transform.position;
     }
 
     void Update()
@@ -29,14 +30,24 @@ public class CameraController : MonoBehaviour
         if (shakeDuration > 0)
         {
             shakeDuration -= Time.deltaTime;
-            shakeTransform.localPosition = startPosition + Vector3.ProjectOnPlane(UnityEngine.Random.insideUnitSphere * (shakeDuration / 10)* shakeIntensity, shakeTransform.forward);
+            shakeTransform.localPosition = shakeStartPosition + Vector3.ProjectOnPlane(UnityEngine.Random.insideUnitSphere * (shakeDuration / 10)* shakeIntensity, shakeTransform.forward);
 
             if (shakeDuration < 0)
             {
-                shakeTransform.localPosition = startPosition;
+                shakeTransform.localPosition = shakeStartPosition;
                 shakeIntensity = 0;
             }
         }
+        
+        transform.position = Vector3.Lerp(transform.position, startPosition + Vector3.down * moveYTarget, leprSpeed * Time.deltaTime);
+    }
+    
+    float leprSpeed = 5f;
+    float moveYTarget = 0;
+    
+    public void MoveDownOneFloor()
+    {
+        moveYTarget += 4;
     }
 
     public void Shake(float duration, float intensity)

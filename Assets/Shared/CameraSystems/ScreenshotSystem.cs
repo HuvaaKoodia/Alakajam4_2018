@@ -85,8 +85,7 @@ public class ScreenshotSystem : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.P))
 			TakeScreenshot(true);
 #else
-		if (InputManager.GetButtonDown("TakeScreenshot"))
-			TakeScreenshot(false);
+
 #endif
 
 	}

@@ -10,9 +10,14 @@ public class PlayerView : MonoBehaviour
 	public float jumpForce = 5f, moveForce = 5f;
 
 	public PhysicsMaterial2D jumpFriction, groundFriction;
-
+	public Animator animator;
+	public Transform rotationParent;
+	public float rotationSpeed = 1f;
 	public bool onGround = false;
 	public float groundCheckDistance = 2f;
+
+	Vector3 currentLookDirection = Vector3.forward;
+
 	#endregion
 	#region initialization
 	void Start()
@@ -29,9 +34,8 @@ public class PlayerView : MonoBehaviour
 		if (!onGround && rigidbody.velocity.y <= 0)
 		{
 			var hitR = Physics2D.Raycast(transform.position + Vector3.right * 0.9f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
-			
+
 			var hitL = Physics2D.Raycast(transform.position + Vector3.left * 0.9f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
-			
 
 #if UNITY_EDITOR
 			Debug.DrawRay(transform.position, Vector2.down, Color.red, groundCheckDistance);
@@ -52,10 +56,19 @@ public class PlayerView : MonoBehaviour
 		}
 		var v = rigidbody.velocity;
 
-		v.x = horizontalAxis * moveForce * Time.deltaTime;
+		v.x = horizontalAxis * moveForce;
+
+		if (animator)
+			animator.SetBool("walkbool", horizontalAxis != 0);
 
 		rigidbody.velocity = v;
-		rigidbody.AddForce(Vector2.right , ForceMode2D.Force);
+
+		if (horizontalAxis != 0)
+		{
+			currentLookDirection = Vector3.forward * horizontalAxis;
+		}
+
+		rotationParent.localRotation = Quaternion.Lerp(rotationParent.localRotation, Quaternion.LookRotation(currentLookDirection, Vector3.up), rotationSpeed * Time.deltaTime);
 	}
 	#endregion
 	#region public interface
