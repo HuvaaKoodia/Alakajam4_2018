@@ -17,8 +17,10 @@ public class LevelGenerator : MonoBehaviour
 		bool falling = false, empty = false;
 		int fallingSpeedIndex = 1;
 		float timer;
+		
+        public Vector2 posOffset;
 
-		public void SetFalling(int speedIndex)
+        public void SetFalling(int speedIndex)
 		{
 			fallingSpeedIndex = speedIndex;
 			if (!falling)
@@ -93,6 +95,11 @@ public class LevelGenerator : MonoBehaviour
 	public List<RoomView> rooms = new List<RoomView>();
 	public TileView wallPrefab, floorPrefab;
 	public GameObject BG;
+
+	public Sprite[] smallDecals, bigDecals;
+	public SpriteRenderer decalPrefab;
+	public int minDecalPerRoom = 1, maxDecalPerRoom = 5;
+
 	#endregion
 	#region initialization
 	private void Awake()
@@ -129,6 +136,7 @@ public class LevelGenerator : MonoBehaviour
 	#region public interface
 
 	int roomIndex = 0;
+	Vector2Int[] bigDecalPositions = new Vector2Int[] { Vector2Int.right, Vector2Int.one, Vector2Int.up };
 
 	private void GenerateNextRoom(string roomType, bool randomRoom = true)
 	{
@@ -157,6 +165,9 @@ public class LevelGenerator : MonoBehaviour
 		roomView.index = roomIndex++; //Debug only
 		roomView.tileTable = new TileView[room.width, room.height];
 
+		bool[, ] decalPositionsFreeTable = new bool[room.width, room.height];
+		List<Vector2Int> decalPositionsFreeList = new List<Vector2Int>();
+
 		for (int i = 0; i < room.width; i++)
 		{
 			bool topCheckOn = false;
@@ -184,7 +195,44 @@ public class LevelGenerator : MonoBehaviour
 					var tile = Instantiate(prefab, pos, Quaternion.identity);
 					roomView.tileTable[i, j] = tile;
 				}
+				else if (i > 0 && i < room.width - 1 && j > 0 && j < room.height - 2)
+				{
+					decalPositionsFreeTable[i, j] = true;
+					decalPositionsFreeList.Add(new Vector2Int(i, j));
+				}
 			}
+		}
+
+		//Add decals
+		int decalAmount = Helpers.Rand(minDecalPerRoom, maxDecalPerRoom);
+
+		for (int i = 0; i < decalAmount; i++)
+		{
+			var position = Helpers.RandRemove(decalPositionsFreeList);
+
+			bool canAddBigDecal = true;
+
+			foreach (var pos in bigDecalPositions)
+			{
+				if (room.data[position.x + pos.x, position.y + pos.y] != TileID.Empty)
+				{
+					canAddBigDecal = false;
+					break;
+				}
+			}
+			
+			var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity) as SpriteRenderer;
+			
+			if (canAddBigDecal && Helpers.RandPercent(35))
+			{
+				decal.sprite = Helpers.Rand(bigDecals);
+			}
+			else
+			{
+				decal.sprite = Helpers.Rand(smallDecals);				
+			}
+
+			decalPositionsFreeTable[position.x, position.y] = false;
 		}
 
 		//Steal top row from last room view.... Ugly as heck!
@@ -202,7 +250,7 @@ public class LevelGenerator : MonoBehaviour
 		{
 			for (int i = rooms.Count - 3; i < rooms.Count; i++)
 			{
-				Debug.Log(3 - (i - (rooms.Count - 3)));
+				
 				rooms[i].SetFalling(3 - (i - (rooms.Count - 3)));
 			}
 		}
@@ -217,7 +265,8 @@ public class LevelGenerator : MonoBehaviour
 			Instantiate(BG, BG.transform.position + (Vector3.down * 13 * Mathf.Floor(roomCount / 3f)), Quaternion.identity);
 	}
 
-	public void SetTileToPos(TileView tileView)
+
+    public void SetTileToPos(TileView tileView)
 	{
 		int x = (int)tileView.transform.position.x;
 		int y = (int)tileView.transform.position.y;

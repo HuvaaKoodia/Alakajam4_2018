@@ -1634,7 +1634,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.5
-      value: 0.8
+      value: 0.7
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -2109,14 +2109,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 50720578352546158}
   jumpForce: 6
-  moveForce: 4
+  moveForce: 5.5
+  crouchingForce: 3.5
   jumpFriction: {fileID: 6200000, guid: 8e412ca9e19e841a18b466f8481e93c0, type: 2}
   groundFriction: {fileID: 6200000, guid: 43858dc8f108d42d4b25922303b4c157, type: 2}
   animator: {fileID: 95297125024268632}
   rotationParent: {fileID: 4730768514528210}
   rotationSpeed: 10
   onGround: 0
-  groundCheckDistance: 1.1
+  groundCheckDistance: 0.75
   box: {fileID: 61607880536752752}
   capsule: {fileID: 70699724772087130}
   dead: 0
