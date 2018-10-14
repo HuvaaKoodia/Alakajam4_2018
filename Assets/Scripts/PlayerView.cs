@@ -25,6 +25,7 @@ public class PlayerView : MonoBehaviour
 
 	Vector3 currentLookDirection = Vector3.forward;
 	bool crouching = false;
+	float crouchTarget = 0.0f;
 
 	#endregion
 	#region initialization
@@ -87,12 +88,11 @@ public class PlayerView : MonoBehaviour
 			currentLookDirection = Vector3.forward * horizontalAxis;
 		}
 
-		Debug.Log("VAxis: " + verticalAxis);
-
+		//Crouching
 		if (!crouching && onGround && verticalAxis < 0)
 		{
 			crouching = true;
-			graphicsParent.transform.localScale = new Vector3(1, 0.5f);
+			crouchTarget = 1.0f;
 
 			capsule.offset = new Vector2(0, -capsuleColliderStartSize.y * 0.25f);
 			capsule.size = new Vector2(capsuleColliderStartSize.x, capsuleColliderStartSize.y * 0.5f);
@@ -101,14 +101,21 @@ public class PlayerView : MonoBehaviour
 			box.size = new Vector2(boxColliderStartSize.x, boxColliderStartSize.y * 0.5f);
 		}
 
+			var groundHitUp = Physics2D.CircleCast(transform.position + (Vector3)capsule.offset * 2, capsule.size.x * 0.9f, Vector3.up, capsule.size.y * 1.5f, LayerMasks.groundCheck);
+			
+			#if UNITY_EDITOR
+		Debug.DrawRay(transform.position + (Vector3)capsule.offset* 2, Vector3.up * capsule.size.y* 1.5f, Color.green, 2f);
+		Debug.DrawRay(transform.position + (Vector3)capsule.offset* 2 + Vector3.up * capsule.size.y* 1.5f, Vector2.up * capsule.size.x * 0.9f, (groundHitUp ? Color.red : Color.blue), 2f);
+#endif
+			
 		if (crouching && (verticalAxis >= 0 || !onGround))
 		{
-			var groundHitUp = Physics2D.CircleCast(transform.position + (Vector3)capsule.offset, capsule.size.x * 0.9f, Vector2.up, capsule.size.y, LayerMasks.groundCheck);
+
 
 			if (!groundHitUp)
 			{
+				crouchTarget = 0.0f;
 				crouching = false;
-				graphicsParent.transform.localScale = Vector3.one;
 
 				capsule.offset = Vector2.zero;
 				capsule.size = capsuleColliderStartSize;
@@ -117,6 +124,8 @@ public class PlayerView : MonoBehaviour
 				box.size = boxColliderStartSize;
 			}
 		}
+
+		animator.SetFloat("Crouch", crouchTarget, 0.2f, Time.deltaTime);
 
 		rotationParent.localRotation = Quaternion.Lerp(rotationParent.localRotation, Quaternion.LookRotation(currentLookDirection, Vector3.up), rotationSpeed * Time.deltaTime);
 	}

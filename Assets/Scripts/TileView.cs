@@ -47,7 +47,7 @@ public class TileView : MonoBehaviour
 			}
 
 			//Tile hit
-			var hit = Physics2D.Raycast(transform.position + Vector3.one * 0.5f, Vector3.down, 1f, LayerMasks.tiles);
+			var hit = Physics2D.Raycast(transform.position + Vector3.one * 0.5f, Vector3.down, 1f, LayerMasks.tile);
 
 			if (hit)
 			{

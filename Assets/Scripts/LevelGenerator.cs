@@ -99,7 +99,7 @@ public class LevelGenerator : MonoBehaviour
 	public TileView wallPrefab, floorPrefab;
 	public GameObject BG;
 
-	public Sprite[] smallDecals, bigDecals;
+	public Sprite[] smallDecals, bigDecals, hugeDecals;
 	public SpriteRenderer decalPrefab;
 	public int minDecalPerRoom = 1, maxDecalPerRoom = 5;
 
@@ -139,7 +139,13 @@ public class LevelGenerator : MonoBehaviour
 	#region public interface
 
 	int roomIndex = 0;
-	Vector2Int[] bigDecalPositions = new Vector2Int[] { Vector2Int.right, Vector2Int.one, Vector2Int.up };
+	Vector2Int[] bigDecalPositions = new Vector2Int[] {
+		 new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1) };
+
+	Vector2Int[] hugeDecalPositions = new Vector2Int[] { 
+		new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), 
+	 new Vector2Int(2, 0), new Vector2Int(1, 2), new Vector2Int(0, 2), 
+	 new Vector2Int(1, 2), new Vector2Int(2, 2)};
 
 	private void GenerateNextRoom(string roomType, bool randomRoom = true)
 	{
@@ -198,7 +204,7 @@ public class LevelGenerator : MonoBehaviour
 					var tile = Instantiate(prefab, pos, Quaternion.identity);
 					roomView.tileTable[i, j] = tile;
 				}
-				else if (i > 0 && i < room.width - 1 && j > 0 && j < room.height - 2)
+				else if (i > 0 && i < room.width - 1 && j > 0 && j < room.height - 1)
 				{
 					decalPositionsFreeTable[i, j] = true;
 					decalPositionsFreeList.Add(new Vector2Int(i, j));
@@ -213,7 +219,7 @@ public class LevelGenerator : MonoBehaviour
 		{
 			var position = Helpers.RandRemove(decalPositionsFreeList);
 
-			bool canAddBigDecal = true;
+			bool canAddBigDecal = true, canAddHugeDecal = true;
 
 			foreach (var pos in bigDecalPositions)
 			{
@@ -222,12 +228,43 @@ public class LevelGenerator : MonoBehaviour
 				if (room.data[x, y] != TileID.Empty || !decalPositionsFreeTable[x, y])
 				{
 					canAddBigDecal = false;
+					canAddHugeDecal = false;
 					break;
 				}
 			}
 
-			var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity)as SpriteRenderer;
+			if (canAddBigDecal)
+			{
+				foreach (var pos in hugeDecalPositions)
+				{
+					int x = position.x + pos.x, y = position.y + pos.y;
 
+					if (room.data[x, y] != TileID.Empty || !decalPositionsFreeTable[x, y])
+					{
+						canAddHugeDecal = false;
+						break;
+					}
+				}
+			}
+
+			var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity)as SpriteRenderer;
+			if (canAddHugeDecal && Helpers.RandPercent(40))
+			{
+				decal.sprite = Helpers.Rand(hugeDecals);
+
+				foreach (var pos in hugeDecalPositions)
+				{
+					int x = position.x + pos.x, y = position.y + pos.y;
+					decalPositionsFreeTable[x, y] = false;
+
+					for (int j = 0; j < decalPositionsFreeList.Count; j++)
+					{ //Ugly hack
+						if (decalPositionsFreeList[j].x == x && decalPositionsFreeList[j].y == y)
+							decalPositionsFreeList.RemoveAt(j);
+					}
+				}
+			}
+			else
 			if (canAddBigDecal && Helpers.RandPercent(35))
 			{
 				decal.sprite = Helpers.Rand(bigDecals);

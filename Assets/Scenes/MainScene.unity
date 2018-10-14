@@ -1096,6 +1096,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a596cfe0db4746cbbe2b16648fd6f18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bodies: []
+  explosiveForce: 0
 --- !u!61 &1306361115
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1139,6 +1141,12 @@ MonoBehaviour:
   jitterTimeMax: 1.5
   jitter: {fileID: 0}
   falling: 0
+  canBeCrushed: 0
+  onCrush:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1 &1409067062
 GameObject:
   m_ObjectHideFlags: 0
@@ -1176,7 +1184,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1409067062}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 863c3aaddcdca4d8db7f9c7c162811b3, type: 3}
   m_Name: 
@@ -1187,15 +1195,16 @@ MonoBehaviour:
     type: 2}
   BG: {fileID: 1601654792}
   smallDecals:
-  - {fileID: 21300000, guid: 6f3437a7251255843b300b96b07fd276, type: 3}
   - {fileID: 21300000, guid: 5f88ad47f943dd844803bc9a6f2b9af4, type: 3}
-  - {fileID: 21300000, guid: 4eba776b3d4aba54ab1bdd0f914c2f3e, type: 3}
   bigDecals:
+  - {fileID: 21300000, guid: 6f3437a7251255843b300b96b07fd276, type: 3}
+  - {fileID: 21300000, guid: 4eba776b3d4aba54ab1bdd0f914c2f3e, type: 3}
+  hugeDecals:
   - {fileID: 21300000, guid: dd51e20e61bfffc4bae01bbd24fd77ae, type: 3}
   decalPrefab: {fileID: 212933158561013094, guid: e4081515c1377491db24cddd0a8712cc,
     type: 2}
   minDecalPerRoom: 1
-  maxDecalPerRoom: 5
+  maxDecalPerRoom: 3
 --- !u!114 &1409067066
 MonoBehaviour:
   m_ObjectHideFlags: 0
