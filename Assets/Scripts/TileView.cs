@@ -9,12 +9,20 @@ public class TileView : MonoBehaviour
 	public float jitterTimeMin = 1.0f, jitterTimeMax = 1.2f;
 	public Jitter jitter;
 	public bool falling = false;
+	public bool canBeCrushed = false;
+	public UnityEngine.Events.UnityEvent onCrush;
 
 	public void SetJitterFalling()
 	{
 		falling = true;
 		jitter.enabled = true;
 		StartCoroutine(FallCoroutine());
+	}
+
+	public void Crush()
+	{
+		enabled = false;
+		onCrush.Invoke();
 	}
 
 	IEnumerator FallCoroutine()

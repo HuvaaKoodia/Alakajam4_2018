@@ -13,7 +13,6 @@ public class MainController : MonoBehaviour
 	private void Awake()
 	{
 		I = this;
-
 	}
 
 	IEnumerator Start()

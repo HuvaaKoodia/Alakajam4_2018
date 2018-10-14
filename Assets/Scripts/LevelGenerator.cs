@@ -17,10 +17,10 @@ public class LevelGenerator : MonoBehaviour
 		bool falling = false, empty = false;
 		int fallingSpeedIndex = 1;
 		float timer;
-		
-        public Vector2 posOffset;
 
-        public void SetFalling(int speedIndex)
+		public Vector2 posOffset;
+
+		public void SetFalling(int speedIndex)
 		{
 			fallingSpeedIndex = speedIndex;
 			if (!falling)
@@ -70,18 +70,21 @@ public class LevelGenerator : MonoBehaviour
 
 				if (tileTable[x, 4] != null)
 				{
-					tileTable[x, 4].SetJitterFalling();
-					tileTable[x, 4] = null;
-
-					//if anything above it, drop it too
-					if (index - 1 >= 0)
+					if (tileTable[x, 3] == null)
 					{
-						var room2 = LevelGenerator.I.rooms[index - 1];
-						for (int i = 0; i < room2.height - 1; i++)
-						{
-							if (room2.tileTable[x, i] != null && !room2.tileTable[x, i].falling)
-								room2.tileTable[x, i].SetFalling();
+						tileTable[x, 4].SetJitterFalling();
+						tileTable[x, 4] = null;
 
+						//if anything above it, drop it too
+						if (index - 1 >= 0)
+						{
+							var room2 = LevelGenerator.I.rooms[index - 1];
+							for (int i = 0; i < room2.height - 1; i++)
+							{
+								if (room2.tileTable[x, i] != null && !room2.tileTable[x, i].falling)
+									room2.tileTable[x, i].SetFalling();
+
+							}
 						}
 					}
 				}
@@ -214,22 +217,36 @@ public class LevelGenerator : MonoBehaviour
 
 			foreach (var pos in bigDecalPositions)
 			{
-				if (room.data[position.x + pos.x, position.y + pos.y] != TileID.Empty)
+				int x = position.x + pos.x, y = position.y + pos.y;
+
+				if (room.data[x, y] != TileID.Empty || !decalPositionsFreeTable[x, y])
 				{
 					canAddBigDecal = false;
 					break;
 				}
 			}
-			
-			var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity) as SpriteRenderer;
-			
+
+			var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity)as SpriteRenderer;
+
 			if (canAddBigDecal && Helpers.RandPercent(35))
 			{
 				decal.sprite = Helpers.Rand(bigDecals);
+
+				foreach (var pos in bigDecalPositions)
+				{
+					int x = position.x + pos.x, y = position.y + pos.y;
+					decalPositionsFreeTable[x, y] = false;
+
+					for (int j = 0; j < decalPositionsFreeList.Count; j++)
+					{ //Ugly hack
+						if (decalPositionsFreeList[j].x == x && decalPositionsFreeList[j].y == y)
+							decalPositionsFreeList.RemoveAt(j);
+					}
+				}
 			}
 			else
 			{
-				decal.sprite = Helpers.Rand(smallDecals);				
+				decal.sprite = Helpers.Rand(smallDecals);
 			}
 
 			decalPositionsFreeTable[position.x, position.y] = false;
@@ -250,7 +267,6 @@ public class LevelGenerator : MonoBehaviour
 		{
 			for (int i = rooms.Count - 3; i < rooms.Count; i++)
 			{
-				
 				rooms[i].SetFalling(3 - (i - (rooms.Count - 3)));
 			}
 		}
@@ -265,8 +281,7 @@ public class LevelGenerator : MonoBehaviour
 			Instantiate(BG, BG.transform.position + (Vector3.down * 13 * Mathf.Floor(roomCount / 3f)), Quaternion.identity);
 	}
 
-
-    public void SetTileToPos(TileView tileView)
+	public void SetTileToPos(TileView tileView)
 	{
 		int x = (int)tileView.transform.position.x;
 		int y = (int)tileView.transform.position.y;
