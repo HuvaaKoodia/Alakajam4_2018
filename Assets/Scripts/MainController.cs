@@ -23,21 +23,23 @@ public class MainController : MonoBehaviour
 
 		LevelGenerator.I.GenerateStartRooms();
 
-		player.transform.position = new Vector3(2, 3);
+		player.transform.position = new Vector3(2, -2);
 		started = true;
 
-		StartCoroutine(TileFallC(0, 0.5f, 1.5f));
-		StartCoroutine(TileFallC(1, 1.0f, 2.0f));
-		StartCoroutine(TileFallC(2, 1.5f, 2.5f));
 	}
 	#endregion
 	#region logic
 
-	float currentFloorLevel = 0;
+	float currentFloorLevel = -4f;
 	bool started = false;
 
 	void Update()
 	{
+		if (Input.GetButtonDown("Restart"))
+		{
+			Helpers.ReloadScene();
+		}
+		
 		if (started && player.transform.position.y < currentFloorLevel)
 		{
 			CameraController.I.MoveDownOneFloor();
@@ -49,37 +51,6 @@ public class MainController : MonoBehaviour
 	#region public interface
 	#endregion
 	#region private interface
-
-	public IEnumerator TileFallC(int roomIndex, float timeMin, float timeMax)
-	{
-		while (true)
-		{
-			yield return new WaitForSeconds(Helpers.Rand(timeMin, timeMax));
-
-			var topFloor = LevelGenerator.I.rooms[roomIndex];
-			int index = Helpers.Rand(1, topFloor.width - 2);
-
-			for (int i = 0; i < 50; i++)
-			{ //ugly hack
-				if (topFloor.tileTable[index, topFloor.height - 1] == null)
-				{
-					index = Helpers.Rand(1, topFloor.width - 2);
-				}
-				else
-					break;
-			}
-
-			for (int i = 3; i < topFloor.height; i++)
-			{
-				if (topFloor.tileTable[index, i] != null)
-				{
-					topFloor.tileTable[index, i].Fall();
-					topFloor.tileTable[index, i] = null;
-				}
-			}
-		}
-	}
-
 	#endregion
 	#region events
 	#endregion

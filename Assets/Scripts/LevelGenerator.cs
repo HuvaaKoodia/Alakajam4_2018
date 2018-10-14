@@ -9,17 +9,90 @@ public class LevelGenerator : MonoBehaviour
 	{ //Hacks
 		public int index = 0;
 		public TileView[, ] tileTable;
-		public List<TileView> tiles = new List<TileView>();
+		public int startX, startY;
 
 		public int width { get { return tileTable.GetLength(0); } }
 		public int height { get { return tileTable.GetLength(1); } }
+
+		bool falling = false, empty = false;
+		int fallingSpeedIndex = 1;
+		float timer;
+
+		public void SetFalling(int speedIndex)
+		{
+			fallingSpeedIndex = speedIndex;
+			if (!falling)
+			{
+				falling = true;
+
+				UpdateTimer();
+			}
+
+		}
+
+		private void UpdateTimer()
+		{
+			if (fallingSpeedIndex == 3)
+				timer = Helpers.Rand(0.5f, 1.5f);
+			else if (fallingSpeedIndex == 2)
+				timer = Helpers.Rand(1.0f, 2.0f);
+			else if (fallingSpeedIndex == 1)
+				timer = Helpers.Rand(1.5f, 2.5f);
+		}
+
+		public void Update()
+		{
+			if (empty)
+				return;
+
+			timer -= Time.deltaTime;
+
+			if (timer < 0)
+			{
+				UpdateTimer();
+
+				var availableRooms = new List<int>();
+				for (int i = 1; i < width - 1; i++)
+				{
+					if (tileTable[i, height - 1] != null)
+						availableRooms.Add(i);
+				}
+
+				if (availableRooms.Count == 0)
+				{
+					empty = false;
+					return;
+				}
+
+				int x = Helpers.Rand(availableRooms);
+
+				if (tileTable[x, 4] != null)
+				{
+					tileTable[x, 4].SetJitterFalling();
+					tileTable[x, 4] = null;
+
+					//if anything above it, drop it too
+					if (index - 1 >= 0)
+					{
+						var room2 = LevelGenerator.I.rooms[index - 1];
+						for (int i = 0; i < room2.height - 1; i++)
+						{
+							if (room2.tileTable[x, i] != null && !room2.tileTable[x, i].falling)
+								room2.tileTable[x, i].SetFalling();
+
+						}
+					}
+				}
+			}
+		}
 	}
 
 	#region variables
 	public static LevelGenerator I;
 
 	public List<RoomView> rooms = new List<RoomView>();
-	public TileView tilePrefab;
+	public TileView wallPrefab, floorPrefab;
+	public GameObject BG;
 	#endregion
 	#region initialization
 	private void Awake()
@@ -32,8 +105,9 @@ public class LevelGenerator : MonoBehaviour
 
 	public void GenerateStartRooms()
 	{
-		GenerateNextRoom("Start", false);
-		GenerateNextRoom("Base");
+		GenerateNextRoom("Start1", false);
+		GenerateNextRoom("Start2", false);
+		GenerateNextRoom("Start3", false);
 		GenerateNextRoom("Base");
 	}
 
@@ -43,6 +117,14 @@ public class LevelGenerator : MonoBehaviour
 	}
 	#endregion
 	#region logic
+	void Update()
+	{
+		for (int i = 0; i < rooms.Count; i++)
+		{
+			rooms[i].Update();
+		}
+
+	}
 	#endregion
 	#region public interface
 
@@ -50,9 +132,6 @@ public class LevelGenerator : MonoBehaviour
 
 	private void GenerateNextRoom(string roomType, bool randomRoom = true)
 	{
-		if (rooms.Count == 3)
-			rooms.RemoveAt(0);
-
 		LevelDatabase.RoomData room;
 
 		if (randomRoom)
@@ -74,7 +153,8 @@ public class LevelGenerator : MonoBehaviour
 			room = LevelDatabase.I.GetOnlyRoom(roomType);
 
 		var roomView = new RoomView();
-		roomView.index = roomIndex++;
+		roomView.startY = -currentYPos;
+		roomView.index = roomIndex++; //Debug only
 		roomView.tileTable = new TileView[room.width, room.height];
 
 		for (int i = 0; i < room.width; i++)
@@ -97,27 +177,64 @@ public class LevelGenerator : MonoBehaviour
 
 				if (room.data[i, j] == TileID.Wall)
 				{
-					var tile = Instantiate(tilePrefab, pos, Quaternion.identity);
-					roomView.tiles.Add(tile);
+					var prefab = floorPrefab;
+					if (i == 0 ||  i == room.width - 1)
+						prefab = wallPrefab;
+
+					var tile = Instantiate(prefab, pos, Quaternion.identity);
 					roomView.tileTable[i, j] = tile;
 				}
 			}
 		}
-		
+
 		//Steal top row from last room view.... Ugly as heck!
 		if (rooms.Count > 0)
 		{
 			var upperRoom = rooms[rooms.Count - 1];
-			for (int i = 1; i < upperRoom.width - 2; i++)
+			for (int i = 1; i < upperRoom.width - 1; i++)
 			{
 				roomView.tileTable[i, roomView.height - 1] = upperRoom.tileTable[i, 0];
+			}
+		}
+
+		//Set falling speeds
+		if (rooms.Count >= 3)
+		{
+			for (int i = rooms.Count - 3; i < rooms.Count; i++)
+			{
+				Debug.Log(3 - (i - (rooms.Count - 3)));
+				rooms[i].SetFalling(3 - (i - (rooms.Count - 3)));
 			}
 		}
 
 		currentYPos += room.height - 1;
 		lastRoomData = room;
 		rooms.Add(roomView);
+
+		roomCount++;
+
+		if (roomCount % 3 == 0)
+			Instantiate(BG, BG.transform.position + (Vector3.down * 13 * Mathf.Floor(roomCount / 3f)), Quaternion.identity);
 	}
+
+	public void SetTileToPos(TileView tileView)
+	{
+		int x = (int)tileView.transform.position.x;
+		int y = (int)tileView.transform.position.y;
+
+		for (int i = 0; i < rooms.Count; i++)
+		{
+			if (y >= rooms[i].startY)
+			{
+				var yOff = y - rooms[i].startY;
+				if (yOff >= rooms[i].startY + rooms[i].height)return;
+
+				rooms[i].tileTable[x, yOff] = tileView;
+			}
+		}
+	}
+
+	int roomCount = 0;
 
 	#endregion
 	#region private interface
