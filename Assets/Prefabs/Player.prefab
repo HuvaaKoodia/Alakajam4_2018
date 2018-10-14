@@ -531,7 +531,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1716787456423132
 GameObject:
   m_ObjectHideFlags: 1
@@ -573,13 +573,15 @@ GameObject:
   m_Component:
   - component: {fileID: 4891549957639684}
   - component: {fileID: 95297125024268632}
+  - component: {fileID: 114204614084094376}
+  - component: {fileID: 114132196112588210}
   m_Layer: 0
   m_Name: SLAVEPLAYER
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1733906923457906
 GameObject:
   m_ObjectHideFlags: 1
@@ -971,7 +973,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1753011690239108}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.49, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4730768514528210}
@@ -1425,7 +1427,7 @@ MeshFilter:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1078487765998168}
-  m_Mesh: {fileID: 43724659936250538, guid: be99e1cdbdb9dcd4b8d3564408757eb8, type: 2}
+  m_Mesh: {fileID: 0}
 --- !u!33 &33490598363915392
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -1483,7 +1485,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.8, y: 1.75}
+  m_Size: {x: 0.7, y: 1.75}
   m_EdgeRadius: 0
 --- !u!70 &70699724772087130
 CapsuleCollider2D:
@@ -1493,12 +1495,12 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 1753011690239108}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 8e412ca9e19e841a18b466f8481e93c0, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.75, y: 1.8}
+  m_Size: {x: 0.7, y: 1.8}
   m_Direction: 0
 --- !u!95 &95297125024268632
 Animator:
@@ -1545,7 +1547,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ec17ceaa560940e9bf0dbeafc3a1971, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SpriteMesh: {fileID: 11400000, guid: be99e1cdbdb9dcd4b8d3564408757eb8, type: 2}
+  m_SpriteMesh: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Materials:
   - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
@@ -1607,6 +1609,51 @@ MonoBehaviour:
   m_Child: {fileID: 0}
   m_ChildTransform: {fileID: 0}
   m_AttachedIK: {fileID: 0}
+--- !u!114 &114132196112588210
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1729492135904338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3760873314c9f4a2790f80a46a0edaea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.5
+      value: 0.8
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  duration: 0.3
 --- !u!114 &114144122771310584
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1655,6 +1702,59 @@ MonoBehaviour:
   m_Child: {fileID: 0}
   m_ChildTransform: {fileID: 0}
   m_AttachedIK: {fileID: 0}
+--- !u!114 &114204614084094376
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1729492135904338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b9a18b9fa43645369535b4f83200331, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  growOnStart: 0
+  minScale: {x: 1, y: 0, z: 1}
+  maxScale: {x: 1, y: 1, z: 1}
+  growDuration: 1
+  shrinkDuration: 0.3
+  growCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  shrinkCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  unscaledTime: 0
+  destroyOnShrink: 0
+  onDestroyStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &114207613226829120
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1923,7 +2023,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Length: 0.9999999
+  m_Length: 1.0000001
   m_Child: {fileID: 0}
   m_ChildTransform: {fileID: 4427568995632320}
   m_AttachedIK: {fileID: 0}
@@ -2008,7 +2108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 50720578352546158}
-  jumpForce: 5
+  jumpForce: 6
   moveForce: 4
   jumpFriction: {fileID: 6200000, guid: 8e412ca9e19e841a18b466f8481e93c0, type: 2}
   groundFriction: {fileID: 6200000, guid: 43858dc8f108d42d4b25922303b4c157, type: 2}
@@ -2016,7 +2116,14 @@ MonoBehaviour:
   rotationParent: {fileID: 4730768514528210}
   rotationSpeed: 10
   onGround: 0
-  groundCheckDistance: 1
+  groundCheckDistance: 1.1
+  box: {fileID: 61607880536752752}
+  capsule: {fileID: 70699724772087130}
+  dead: 0
+  graphicsParent: {fileID: 1729492135904338}
+  squish: {fileID: 114132196112588210}
+  blood: {fileID: 0}
+  crushScale: {fileID: 114204614084094376}
 --- !u!114 &114762878986707590
 MonoBehaviour:
   m_ObjectHideFlags: 1

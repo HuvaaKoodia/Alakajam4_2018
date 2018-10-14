@@ -29,6 +29,7 @@ public class LevelDatabase : MonoBehaviour
     {
         public TileID[,] data;
         public int index;
+        
         public int width { get { return data.GetLength(0); } }
         public int height { get { return data.GetLength(1); } }
     }

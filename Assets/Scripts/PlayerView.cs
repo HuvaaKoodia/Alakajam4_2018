@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,44 +16,53 @@ public class PlayerView : MonoBehaviour
 	public float rotationSpeed = 1f;
 	public bool onGround = false;
 	public float groundCheckDistance = 2f;
+	public Collider2D box, capsule;
+	public bool dead = false;
+	public GameObject graphicsParent;
+	public Squish squish;
 
 	Vector3 currentLookDirection = Vector3.forward;
 
 	#endregion
 	#region initialization
-	void Start()
-	{
-
-	}
 	#endregion
 	#region logic
 	void Update()
 	{
+		if (dead) return;
+
 		float horizontalAxis = Input.GetAxisRaw("Horizontal");
 		bool jumped = Input.GetButtonDown("Jump");
 
-		if (!onGround && rigidbody.velocity.y <= 0)
-		{
-			var hitR = Physics2D.Raycast(transform.position + Vector3.right * 0.9f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
-
-			var hitL = Physics2D.Raycast(transform.position + Vector3.left * 0.9f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
+		var groundHit = Physics2D.CircleCast(transform.position, capsule.bounds.extents.x, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
 
 #if UNITY_EDITOR
-			Debug.DrawRay(transform.position, Vector2.down, Color.red, groundCheckDistance);
+		Debug.DrawRay(transform.position, Vector3.down * groundCheckDistance, Color.red);
+		Debug.DrawRay(transform.position + Vector3.down * groundCheckDistance, Vector2.down * capsule.bounds.extents.x, Color.magenta);
 #endif
 
-			if (hitR || hitL)
+		if (groundHit)
+		{
+			if (!onGround && rigidbody.velocity.y < 0)
 			{
 				onGround = true;
-				//rigidbody.sharedMaterial = groundFriction;
+				animator.SetBool("ilmabool", false);
+				box.enabled = true;
+				squish.SquishIt();
 			}
+			//rigidbody.sharedMaterial = groundFriction;
+		}
+		else if (onGround)
+		{
+			onGround = false;
+			animator.SetBool("ilmabool", true);
+			box.enabled = false;
 		}
 
 		if (onGround && jumped)
 		{
 			rigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-			onGround = false;
-			rigidbody.sharedMaterial = jumpFriction;
+			//rigidbody.sharedMaterial = jumpFriction;
 		}
 		var v = rigidbody.velocity;
 
@@ -69,6 +79,30 @@ public class PlayerView : MonoBehaviour
 		}
 
 		rotationParent.localRotation = Quaternion.Lerp(rotationParent.localRotation, Quaternion.LookRotation(currentLookDirection, Vector3.up), rotationSpeed * Time.deltaTime);
+	}
+
+	public ParticleSystem blood;
+	public Scale crushScale;
+
+	public void CheckCrushingDeath()
+	{
+		dead = true;
+		box.enabled = false;
+		capsule.enabled = false;
+
+		//if (onGround)
+		{
+			crushScale.Shrink();
+
+			animator.SetTrigger("kuolematrig");
+		}
+		// else
+		// {
+		// 	//graphicsParent.gameObject.SetActive(false);	
+
+		// }
+		
+		rigidbody.simulated = false;
 	}
 	#endregion
 	#region public interface

@@ -28,6 +28,11 @@ public class Jitter : MonoBehaviour
     }
     #endregion
     #region public interface
+	public void ResetPos()
+	{
+		transform.localPosition = startPos;
+	}
+	
 	public void IncreaseDistanceOverTime(float targetDistance, float duration)
 	{
 		StartCoroutine(IncreaseCoroutine(targetDistance, duration));
