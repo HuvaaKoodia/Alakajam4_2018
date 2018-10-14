@@ -143,6 +143,15 @@ MonoBehaviour:
   jitterTimeMax: 1.2
   jitter: {fileID: 114807576071123012}
   falling: 0
+  moving: 0
+  canBeCrushed: 0
+  onCrush:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  impact: {fileID: 0}
+  graphicsParent: {fileID: 1917217117048460}
 --- !u!212 &212158555327148864
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -8,9 +8,11 @@ public class TileView : MonoBehaviour
 	public float fallSpeed = 10f;
 	public float jitterTimeMin = 1.0f, jitterTimeMax = 1.2f;
 	public Jitter jitter;
-	public bool falling = false;
+	public bool falling = false, moving = false;
 	public bool canBeCrushed = false;
 	public UnityEngine.Events.UnityEvent onCrush;
+	public AudioPlayer impact;
+	public GameObject graphicsParent;
 
 	public void SetJitterFalling()
 	{
@@ -35,9 +37,21 @@ public class TileView : MonoBehaviour
 			jitter.enabled = false;
 		}
 
+		moving = true;
+
 		while (true)
 		{
+			float distanceToPlayer = Mathf.Abs(transform.position.y - MainController.I.player.transform.position.y);
+			
+			if (distanceToPlayer > 100)
+			{
+				enabled = false;
+				Destroy(graphicsParent);
+				yield break;
+			}
+			
 			//Player hit
+			
 			var hitP = Physics2D.CircleCast(transform.position + Vector3.one * 0.5f, 0.4f, Vector3.down, 0.25f, LayerMasks.player);
 
 			if (hitP)
@@ -53,12 +67,23 @@ public class TileView : MonoBehaviour
 			{
 				transform.position = hit.transform.position + Vector3.up;
 				LevelGenerator.I.SetTileToPos(this);
+				if (moving)
+				{
+					moving = false;
+
+					var other = hit.transform.GetComponent<TileView>();
+					if (other && !other.moving)
+					{
+						if (distanceToPlayer < 8) impact.Play2DSound();
+					}
+				}
 			}
 			else
 				transform.position += Vector3.down * fallSpeed * Time.deltaTime;
 
 			yield return true;
 		}
+		
 	}
 
 	public void SetFalling()

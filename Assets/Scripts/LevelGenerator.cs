@@ -139,13 +139,17 @@ public class LevelGenerator : MonoBehaviour
 	#region public interface
 
 	int roomIndex = 0;
-	Vector2Int[] bigDecalPositions = new Vector2Int[] {
-		 new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1) };
+	Vector2Int[] bigDecalPositions = new Vector2Int[]
+	{
+		new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1)
+	};
 
-	Vector2Int[] hugeDecalPositions = new Vector2Int[] { 
-		new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1), 
-	 new Vector2Int(2, 0), new Vector2Int(1, 2), new Vector2Int(0, 2), 
-	 new Vector2Int(1, 2), new Vector2Int(2, 2)};
+	Vector2Int[] hugeDecalPositions = new Vector2Int[]
+	{
+		new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1),
+			new Vector2Int(2, 0), new Vector2Int(1, 2), new Vector2Int(0, 2),
+			new Vector2Int(1, 2), new Vector2Int(2, 2)
+	};
 
 	private void GenerateNextRoom(string roomType, bool randomRoom = true)
 	{
@@ -217,7 +221,10 @@ public class LevelGenerator : MonoBehaviour
 
 		for (int i = 0; i < decalAmount; i++)
 		{
+			if (decalPositionsFreeList.Count == 0) break;
+
 			var position = Helpers.RandRemove(decalPositionsFreeList);
+			decalPositionsFreeTable[position.x, position.y] = false;
 
 			bool canAddBigDecal = true, canAddHugeDecal = true;
 
@@ -247,9 +254,9 @@ public class LevelGenerator : MonoBehaviour
 				}
 			}
 
-			var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity)as SpriteRenderer;
 			if (canAddHugeDecal && Helpers.RandPercent(40))
 			{
+				var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity)as SpriteRenderer;
 				decal.sprite = Helpers.Rand(hugeDecals);
 
 				foreach (var pos in hugeDecalPositions)
@@ -265,8 +272,9 @@ public class LevelGenerator : MonoBehaviour
 				}
 			}
 			else
-			if (canAddBigDecal && Helpers.RandPercent(35))
+			if (canAddBigDecal)
 			{
+				var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity)as SpriteRenderer;
 				decal.sprite = Helpers.Rand(bigDecals);
 
 				foreach (var pos in bigDecalPositions)
@@ -283,10 +291,15 @@ public class LevelGenerator : MonoBehaviour
 			}
 			else
 			{
+				if (smallDecals.Length == 0)
+				{ //Try again in different position
+					i--;
+					continue;
+				}
+
+				var decal = Instantiate(decalPrefab, (Vector2)position + Vector2.up * roomView.startY, Quaternion.identity)as SpriteRenderer;
 				decal.sprite = Helpers.Rand(smallDecals);
 			}
-
-			decalPositionsFreeTable[position.x, position.y] = false;
 		}
 
 		//Steal top row from last room view.... Ugly as heck!
