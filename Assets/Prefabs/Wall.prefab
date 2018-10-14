@@ -139,7 +139,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fallSpeed: 10
+  jitterTimeMin: 1
+  jitterTimeMax: 1.2
   jitter: {fileID: 114807576071123012}
+  falling: 0
 --- !u!212 &212158555327148864
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -176,7 +179,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 53ab072ddbf124414b51db86855bccc2, type: 3}
-  m_Color: {r: 0.8867924, g: 0.8529854, b: 0.8031328, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
