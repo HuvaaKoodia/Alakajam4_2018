@@ -12,6 +12,7 @@ public class TileView : MonoBehaviour
 	public bool canBeCrushed = false;
 	public UnityEngine.Events.UnityEvent onCrush;
 	public AudioPlayer impact;
+	public ParticleSystem dusty;
 	public GameObject graphicsParent;
 
 	public void SetJitterFalling()
@@ -74,7 +75,11 @@ public class TileView : MonoBehaviour
 					var other = hit.transform.GetComponent<TileView>();
 					if (other && !other.moving)
 					{
-						if (distanceToPlayer < 8) impact.Play2DSound();
+						if (distanceToPlayer < 8)
+						{
+							impact.Play2DSound();
+							dusty.Play();
+						}
 					}
 				}
 			}

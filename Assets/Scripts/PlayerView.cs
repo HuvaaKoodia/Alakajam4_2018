@@ -22,6 +22,7 @@ public class PlayerView : MonoBehaviour
 	public GameObject graphicsParent;
 	public Squish squish;
 	Vector2 capsuleColliderStartSize, boxColliderStartSize;
+	public AudioPlayer splat;
 
 	Vector3 currentLookDirection = Vector3.forward;
 	bool crouching = false;
@@ -141,7 +142,7 @@ public class PlayerView : MonoBehaviour
 		//if (onGround)
 		{
 			crushScale.Shrink();
-
+			splat.Play2DSound();
 			animator.SetTrigger("kuolematrig");
 		}
 		// else

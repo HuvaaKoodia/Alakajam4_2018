@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainController : MonoBehaviour
 {
@@ -8,11 +9,16 @@ public class MainController : MonoBehaviour
 	public static MainController I;
 
 	public PlayerView player;
+	int score = 0;
+	public Text scoreText;
+
 	#endregion
 	#region initialization
 	private void Awake()
 	{
 		I = this;
+
+		scoreText.text = "";
 	}
 
 	IEnumerator Start()
@@ -39,11 +45,20 @@ public class MainController : MonoBehaviour
 			Helpers.ReloadScene();
 		}
 		
+		if (Input.GetButtonDown("BackToMenu"))
+		{
+			Helpers.LoadScene("Menu");
+		}
+
 		if (started && player.transform.position.y < currentFloorLevel)
 		{
 			CameraController.I.MoveDownOneFloor();
 			LevelGenerator.I.GenerateNextRoom();
 			currentFloorLevel -= 4f;
+			score++;
+
+			scoreText.text = "" + score;
+
 		}
 	}
 	#endregion

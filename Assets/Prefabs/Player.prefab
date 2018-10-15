@@ -484,6 +484,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1609838527045492
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4308472295493056}
+  - component: {fileID: 114056037051172876}
+  m_Layer: 10
+  m_Name: Audio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1638045576302236
 GameObject:
   m_ObjectHideFlags: 1
@@ -883,6 +899,19 @@ Transform:
   m_Father: {fileID: 4439615800830472}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4308472295493056
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1609838527045492}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4433279879512234}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4348175348266644
 Transform:
   m_ObjectHideFlags: 1
@@ -977,6 +1006,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4730768514528210}
+  - {fileID: 4308472295493056}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1456,7 +1486,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 1.5
+  m_GravityScale: 2
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -1571,6 +1601,28 @@ MonoBehaviour:
   m_Child: {fileID: 0}
   m_ChildTransform: {fileID: 4459280381051522}
   m_AttachedIK: {fileID: 0}
+--- !u!114 &114056037051172876
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1609838527045492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab0be8d98c5a4b16a4c49f0921c5615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  randomClip: 0
+  AudioClips:
+  - {fileID: 8300000, guid: ebb98974d9c574f5fb5939f71ccc8ed1, type: 3}
+  AudioMixerGroup: {fileID: 243276316065182160, guid: 4b0a16cc95c8c42178042ed6f11ce6f9,
+    type: 2}
+  channel: 1
+  loop: 0
+  panning: 0
+  useCustomPitch: 0
+  pitch: {x: 0.8, y: 0.8}
+  play2DAtStart: 0
 --- !u!114 &114083105212327148
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2109,7 +2161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 50720578352546158}
-  jumpForce: 6
+  jumpForce: 9
   moveForce: 5.5
   crouchingForce: 2.75
   jumpFriction: {fileID: 6200000, guid: 8e412ca9e19e841a18b466f8481e93c0, type: 2}
@@ -2124,6 +2176,7 @@ MonoBehaviour:
   dead: 0
   graphicsParent: {fileID: 1729492135904338}
   squish: {fileID: 114132196112588210}
+  splat: {fileID: 114056037051172876}
   blood: {fileID: 0}
   crushScale: {fileID: 114204614084094376}
 --- !u!114 &114762878986707590
