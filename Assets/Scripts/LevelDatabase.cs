@@ -1,14 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Collections;
-using System;
+using UnityEngine;
 
 public enum TileID
 {
     None = -1,
     Empty = 0,
     Wall,
+    StatueR,
+    StatueL
 }
 
 public class LevelDatabase : MonoBehaviour
@@ -27,7 +29,7 @@ public class LevelDatabase : MonoBehaviour
 
     public class RoomData
     {
-        public TileID[,] data;
+        public TileID[, ] data;
         public int index;
 
         public int width { get { return data.GetLength(0); } }
@@ -37,14 +39,14 @@ public class LevelDatabase : MonoBehaviour
     #region initialization
     private void Awake()
     {
-		if (I != null)
-		{
-			Destroy(gameObject);
-			return;
-		}
+        if (I != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         I = this;
-		DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject);
 
         for (int i = 0; i < roomTypeWeights.Length; i++)
         {
@@ -60,11 +62,11 @@ public class LevelDatabase : MonoBehaviour
     public RoomData GetOnlyRoom(string roomType)
     {
         var list = rooms[roomType];
-        
+
         for (int i = 0; i < list.Length; i++)
         {
             if (list[i].Count > 0)
-            return list[i][0];
+                return list[i][0];
         }
         return null;
     }
@@ -80,7 +82,7 @@ public class LevelDatabase : MonoBehaviour
         }
     }
 
-    public TileID[,] rotateArrayLeft(TileID[,] matrix)
+    public TileID[, ] rotateArrayLeft(TileID[, ] matrix)
     {
         /* W and H are already swapped */
         int w = matrix.GetLength(0);
@@ -131,7 +133,10 @@ public class LevelDatabase : MonoBehaviour
             for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
                 var line = lines[lineIndex];
+                if (line.StartsWith("//")) continue;
+                    
                 var lineSplit = Helpers.Split(line, ",");
+                
 
                 if (line.StartsWith("Room"))
                 {
@@ -147,14 +152,14 @@ public class LevelDatabase : MonoBehaviour
                         int startIndex = 2;
                         for (int i = startIndex; i < startIndex + 4; i++)
                         {
-                            if (int.Parse(dataSplit[i]) == 1)
+                            if (int.Parse(dataSplit[i])== 1)
                             {
                                 roomIndex = roomIndex | 1 << (i - startIndex);
                             }
                         }
 
                         if (dataSplit.Length > 6)
-                            addRotations = dataSplit[6].ToLower() == "r";
+                            addRotations = dataSplit[6].ToLower()== "r";
                     }
                     else
                     {
@@ -162,7 +167,7 @@ public class LevelDatabase : MonoBehaviour
                         roomIndex = int.Parse(dataSplit[2]);
 
                         if (dataSplit.Length > 3)
-                            addRotations = dataSplit[3].ToLower() == "r";
+                            addRotations = dataSplit[3].ToLower()== "r";
                     }
 
                     string roomType = dataSplit[1];
@@ -181,7 +186,7 @@ public class LevelDatabase : MonoBehaviour
                     while (lineIndex + roomMaxHeight + 1 < lines.Length)
                     {
                         var nextLine = lines[lineIndex + roomMaxHeight + 1];
-                        if (nextLine.StartsWith("Room") || nextLine.StartsWith(",") || string.IsNullOrEmpty(nextLine))
+                        if (nextLine.StartsWith("Room")|| nextLine.StartsWith(",")|| string.IsNullOrEmpty(nextLine))
                             break;
                         roomMaxHeight++;
                     }
@@ -200,18 +205,26 @@ public class LevelDatabase : MonoBehaviour
 
                         if (tile == "w")
                             tileID = TileID.Wall;
+                        else if (tile == "." || tile == "0")
+                            tileID = TileID.Empty;
+                        else if (tile == "sr")
+                            tileID = TileID.StatueR;
+                        else if (tile == "sl")
+                            tileID = TileID.StatueL;
+                        else
+                            Debug.LogError(tile + " in level is not a defined symbol!");
 
-                        currentRoom.data[i, roomMaxHeight - currentVerticalIndex - 1] = tileID;//hack vertical reversal
+                        currentRoom.data[i, roomMaxHeight - currentVerticalIndex - 1] = tileID; //hack vertical reversal
                     }
                     currentVerticalIndex++;
 
-                    if (addRotations && currentVerticalIndex == roomMaxHeight) //hack magnum
+                    if (addRotations && currentVerticalIndex == roomMaxHeight)//hack magnum
                     {
                         //add rotations if needed
                         for (int i = 0; i < 3; i++)
                         {
-                            var rotatedData = rotateArrayLeft(currentRoom.data);//rotate data 90 degrees
-                            int newRoomType = (currentRoomIndex << 1 & 15) | (currentRoomIndex >> 3 & 15);//shift wrap type
+                            var rotatedData = rotateArrayLeft(currentRoom.data); //rotate data 90 degrees
+                            int newRoomType = (currentRoomIndex << 1 & 15)| (currentRoomIndex >> 3 & 15); //shift wrap type
 
                             var newRoom = new RoomData();
                             newRoom.data = rotatedData;
@@ -236,13 +249,13 @@ public class LevelDatabase : MonoBehaviour
 
         for (int i = 0; i < paths.Length; i++)
         {
-#if UNITY_STANDALONE //|| UNITY_EDITOR
-			string filePath = "file://" +Path.Combine(Application.streamingAssetsPath, paths[i]);
+#if UNITY_STANDALONE || UNITY_EDITOR
+            string filePath = "file://" + Path.Combine(Application.streamingAssetsPath, paths[i]);
             WWW www = new WWW(filePath);
             yield return www;
             container.content[i] = www.text;
 #elif UNITY_ANDROID
-            string filePath = "jar:file://" + Application.dataPath + "!/assets/"+ paths[i].Replace("\\", "/");
+            string filePath = "jar:file://" + Application.dataPath + "!/assets/" + paths[i].Replace("\\", "/");
             WWW www = new WWW(filePath);
             yield return www;
             container.content[i] = www.text;
@@ -277,6 +290,5 @@ public class LevelDatabase : MonoBehaviour
     //    GUI.TextArea(new Rect(10, 10, 1000, 50), temp);
     //}
     #endregion
-
 
 }

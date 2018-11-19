@@ -15,6 +15,8 @@ public class AudioPlayer : MonoBehaviour
     public Vector2 pitch = Vector2.one;
     [SerializeField]
     private bool play2DAtStart = false;
+    
+    public bool playOnlyCloseToPlayerHack = false;
 
     public AudioSource source { get; private set; }
 
@@ -33,6 +35,15 @@ public class AudioPlayer : MonoBehaviour
     #region public interface
     public void Play2DSound()
     {
+        if (playOnlyCloseToPlayerHack)
+        {
+            float distanceToPlayer = Mathf.Abs(transform.position.y - MainController.I.player.transform.position.y);
+
+            if (distanceToPlayer > 8) return;
+            
+        }
+        
+        
         StopLoopSound();
 
         source = AudioController.I.PlayAudio2D(GetClip(), AudioMixerGroup, channel);

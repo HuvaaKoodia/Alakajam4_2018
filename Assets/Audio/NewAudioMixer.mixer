@@ -21,6 +21,7 @@ AudioMixerController:
     - cd6a070c8141d4c21b00c4e74ab248db
     - 4d98610de86a043b5bc6fcc4ad8b8233
     - c1d4fe772f0d74cd0ab8784a0e2d5e08
+    - 0a2bfce0ad57e4f86a09d72b7c40ab8b
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -36,6 +37,7 @@ AudioMixerGroupController:
   - {fileID: 243181559558686926}
   - {fileID: 243343731013828918}
   - {fileID: 243276316065182160}
+  - {fileID: 243021961452169202}
   m_Volume: c858857d2ff2044d889df7647563578f
   m_Pitch: 8c4c8c06f6a2e4499a1c33a9f597cc89
   m_Effects:
@@ -68,7 +70,25 @@ AudioMixerSnapshotController:
   m_FloatValues:
     7882da6475e8e475d8b6c89f6c857d0c: 4.648096
     73e0d8069e6104eab8359c2ac5cf5c84: -12.498478
+    655ad95a831ec43d2974cc5a0af8f197: -11.400904
   m_TransitionOverrides: {}
+--- !u!243 &243021961452169202
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: StatueCrash
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 0a2bfce0ad57e4f86a09d72b7c40ab8b
+  m_Children: []
+  m_Volume: 655ad95a831ec43d2974cc5a0af8f197
+  m_Pitch: 5c5e5d4ddef0243cfa89c5fbd2544af1
+  m_Effects:
+  - {fileID: 244124525684076618}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!243 &243181559558686926
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -120,6 +140,19 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!244 &244124525684076618
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: b4ee92d421da54dd9a041214f282e802
+  m_EffectName: Attenuation
+  m_MixLevel: 5bd6d53768e1f451d865ed5b59307d40
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &244664546221033280
 AudioMixerEffectController:
   m_ObjectHideFlags: 3

@@ -9,6 +9,7 @@ public class MainController : MonoBehaviour
 	public static MainController I;
 
 	public PlayerView player;
+	public TileSpawner spawner;
 	int score = 0;
 	public Text scoreText;
 
@@ -30,6 +31,7 @@ public class MainController : MonoBehaviour
 
 		player.transform.position = new Vector3(2, -2);
 		started = true;
+		spawner.StartSpawning();
 
 	}
 	#endregion

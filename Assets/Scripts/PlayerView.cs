@@ -43,10 +43,10 @@ public class PlayerView : MonoBehaviour
 
 		float horizontalAxis = Input.GetAxisRaw("Horizontal");
 		float verticalAxis = Input.GetAxisRaw("Vertical");
-		bool jumpInput = Input.GetButtonDown("Jump") || verticalAxis > 0.5f;
+		bool jumpInput = Input.GetButtonDown("Jump")|| verticalAxis > 0.5f;
 		bool crouchInput = verticalAxis < -0.2f;
 
-		var groundHit = Physics2D.CircleCast(transform.position, capsule.size.x * 0.5f * 0.95f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
+		var groundHit = Physics2D.CircleCast(transform.position, capsule.size.x * 0.5f * 1f, Vector2.down, groundCheckDistance, LayerMasks.groundCheck);
 
 #if UNITY_EDITOR
 		Debug.DrawRay(transform.position, Vector3.down * groundCheckDistance, Color.red);
@@ -60,7 +60,9 @@ public class PlayerView : MonoBehaviour
 				onGround = true;
 				animator.SetBool("ilmabool", false);
 				box.enabled = true;
-				squish.SquishIt();
+
+				if (rigidbody.velocity.y <= -2)
+					squish.SquishIt();
 			}
 			//rigidbody.sharedMaterial = groundFriction;
 		}
@@ -71,10 +73,10 @@ public class PlayerView : MonoBehaviour
 			box.enabled = false;
 		}
 
-		if (onGround && jumpInput && rigidbody.velocity.y == 0)
+		if (onGround && jumpInput && !crouching && rigidbody.velocity.y == 0)
 		{
 			rigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-			
+
 		}
 		var v = rigidbody.velocity;
 
@@ -103,13 +105,13 @@ public class PlayerView : MonoBehaviour
 			box.size = new Vector2(boxColliderStartSize.x, boxColliderStartSize.y * 0.5f);
 		}
 
-			var groundHitUp = Physics2D.CircleCast(transform.position + (Vector3)capsule.offset * 2, capsule.size.x * 0.49f, Vector3.up, capsule.size.y * 1.5f, LayerMasks.groundCheck);
-			
-			#if UNITY_EDITOR
-		Debug.DrawRay(transform.position + (Vector3)capsule.offset* 2, Vector3.up * capsule.size.y* 1.5f, Color.green, 2f);
-		Debug.DrawRay(transform.position + (Vector3)capsule.offset* 2 + Vector3.up * capsule.size.y* 1.5f, Vector2.up * capsule.size.x * 0.49f, (groundHitUp ? Color.red : Color.blue), 2f);
+		var groundHitUp = Physics2D.CircleCast(transform.position + (Vector3)capsule.offset * 2, capsule.size.x * 0.49f, Vector3.up, capsule.size.y * 1.5f, LayerMasks.groundCheck);
+
+#if UNITY_EDITOR
+		Debug.DrawRay(transform.position + (Vector3)capsule.offset * 2, Vector3.up * capsule.size.y * 1.5f, Color.green, 2f);
+		Debug.DrawRay(transform.position + (Vector3)capsule.offset * 2 + Vector3.up * capsule.size.y * 1.5f, Vector2.up * capsule.size.x * 0.49f, (groundHitUp ? Color.red : Color.blue), 2f);
 #endif
-			
+
 		if (crouching && (verticalAxis >= 0 || !onGround))
 		{
 			if (!groundHitUp)
@@ -125,7 +127,8 @@ public class PlayerView : MonoBehaviour
 			}
 		}
 
-		animator.SetFloat("Crouch", crouchTarget, 0.2f, Time.deltaTime);
+		animator.SetFloat("Crouch", crouchTarget, 0.08f, Time.deltaTime);
+		animator.SetFloat("WalkSpeed", 0.3f + 0.7f * Mathf.Abs(horizontalAxis));
 
 		rotationParent.localRotation = Quaternion.Lerp(rotationParent.localRotation, Quaternion.LookRotation(currentLookDirection, Vector3.up), rotationSpeed * Time.deltaTime);
 	}
@@ -139,17 +142,9 @@ public class PlayerView : MonoBehaviour
 		box.enabled = false;
 		capsule.enabled = false;
 
-		//if (onGround)
-		{
-			crushScale.Shrink();
-			splat.Play2DSound();
-			animator.SetTrigger("kuolematrig");
-		}
-		// else
-		// {
-		// 	//graphicsParent.gameObject.SetActive(false);	
-
-		// }
+		crushScale.Shrink();
+		splat.Play2DSound();
+		animator.SetTrigger("kuolematrig");
 
 		rigidbody.simulated = false;
 	}

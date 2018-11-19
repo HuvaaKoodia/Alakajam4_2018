@@ -7,6 +7,7 @@ public class RigidboryExplosion : MonoBehaviour
 #region variables
 public Rigidbody2D[] bodies;
 public float explosiveForce;
+public Transform explosionCenter;
 #endregion
 #region initialization
 #endregion
@@ -17,7 +18,12 @@ public void Explode()
 {
 	foreach (var body in bodies)
 	{
-		body.AddForceAtPosition(transform.To(body.transform), transform.position); 
+		//var collider = body.GetComponent<Collider2D>();
+		//collider.enabled = false;
+		body.GetComponent<Scale>().Shrink();
+		body.simulated = true;
+		body.transform.SetParent(null);
+		body.AddForceAtPosition(explosionCenter.To(body.transform) * explosiveForce, transform.position, ForceMode2D.Impulse);
 	}
 }
 #endregion

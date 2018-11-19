@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
-  productName: Alakajam4
+  companyName: HuvaaKoodia
+  productName: Pyramid Peril
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.77674526, g: 0.6233463, b: 0.4313573, a: 1}

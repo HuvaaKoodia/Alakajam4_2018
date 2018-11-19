@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/*
+This code is not pretty, it is hanging by a thread.
+The tile incides and tables are all messed up.  
+*/
 public class LevelGenerator : MonoBehaviour
 {
 	public class RoomView
@@ -14,11 +17,11 @@ public class LevelGenerator : MonoBehaviour
 		public int width { get { return tileTable.GetLength(0); } }
 		public int height { get { return tileTable.GetLength(1); } }
 
-		bool falling = false, empty = false;
+		public Vector2 posOffset;
+
+		bool falling = false;
 		int fallingSpeedIndex = 1;
 		float timer;
-
-		public Vector2 posOffset;
 
 		public void SetFalling(int speedIndex)
 		{
@@ -29,7 +32,6 @@ public class LevelGenerator : MonoBehaviour
 
 				UpdateTimer();
 			}
-
 		}
 
 		private void UpdateTimer()
@@ -44,9 +46,6 @@ public class LevelGenerator : MonoBehaviour
 
 		public void Update()
 		{
-			if (empty)
-				return;
-
 			timer -= Time.deltaTime;
 
 			if (timer < 0)
@@ -56,37 +55,22 @@ public class LevelGenerator : MonoBehaviour
 				var availableRooms = new List<int>();
 				for (int i = 1; i < width - 1; i++)
 				{
-					if (tileTable[i, height - 1] != null)
+					if (tileTable[i, height - 1] != null && tileTable[i, height - 2] == null && tileTable[i, height - 1].stationary)
 						availableRooms.Add(i);
 				}
 
 				if (availableRooms.Count == 0)
 				{
-					empty = false;
+					timer = 10f;
 					return;
 				}
 
 				int x = Helpers.Rand(availableRooms);
 
-				if (tileTable[x, 4] != null)
+				if (tileTable[x, 4] != null && tileTable[x, 3] == null)
 				{
-					if (tileTable[x, 3] == null)
-					{
-						tileTable[x, 4].SetJitterFalling();
-						tileTable[x, 4] = null;
-
-						//if anything above it, drop it too
-						if (index - 1 >= 0)
-						{
-							var room2 = LevelGenerator.I.rooms[index - 1];
-							for (int i = 0; i < room2.height - 1; i++)
-							{
-								if (room2.tileTable[x, i] != null && !room2.tileTable[x, i].falling)
-									room2.tileTable[x, i].SetFalling();
-
-							}
-						}
-					}
+					tileTable[x, 4].SetJitterFalling();
+					//tileTable[x, 4] = null;
 				}
 			}
 		}
@@ -96,7 +80,7 @@ public class LevelGenerator : MonoBehaviour
 	public static LevelGenerator I;
 
 	public List<RoomView> rooms = new List<RoomView>();
-	public TileView wallPrefab, floorPrefab;
+	public TileView wallPrefab, floorPrefab, statuePrefab;
 	public GameObject BG;
 
 	public Sprite[] smallDecals, bigDecals, hugeDecals;
@@ -199,14 +183,30 @@ public class LevelGenerator : MonoBehaviour
 
 				var pos = new Vector3(i, -currentYPos + j);
 
-				if (room.data[i, j] == TileID.Wall)
+				if (room.data[i, j] > TileID.Empty)
 				{
 					var prefab = floorPrefab;
-					if (i == 0 ||  i == room.width - 1)
+					TileView tile = null;
+
+					bool flipGraphics = false;
+					if (room.data[i, j] == TileID.StatueL)
+						prefab = statuePrefab;
+					if (room.data[i, j] == TileID.StatueR)
+					{
+						flipGraphics = true;
+						prefab = statuePrefab;
+					}
+					else if (i == 0 ||  i == room.width - 1)
 						prefab = wallPrefab;
 
-					var tile = Instantiate(prefab, pos, Quaternion.identity);
+					tile = Instantiate(prefab, pos, Quaternion.identity);
 					roomView.tileTable[i, j] = tile;
+					tile.posX = i;
+					tile.posY = j;
+					tile.roomIndex = roomView.index;
+
+					if (flipGraphics)
+						tile.FlipGraphics();
 				}
 				else if (i > 0 && i < room.width - 1 && j > 0 && j < room.height - 1)
 				{
@@ -221,7 +221,7 @@ public class LevelGenerator : MonoBehaviour
 
 		for (int i = 0; i < decalAmount; i++)
 		{
-			if (decalPositionsFreeList.Count == 0) break;
+			if (decalPositionsFreeList.Count == 0)break;
 
 			var position = Helpers.RandRemove(decalPositionsFreeList);
 			decalPositionsFreeTable[position.x, position.y] = false;
@@ -308,7 +308,16 @@ public class LevelGenerator : MonoBehaviour
 			var upperRoom = rooms[rooms.Count - 1];
 			for (int i = 1; i < upperRoom.width - 1; i++)
 			{
-				roomView.tileTable[i, roomView.height - 1] = upperRoom.tileTable[i, 0];
+				var upperTile = upperRoom.tileTable[i, 0];
+
+				if (upperTile != null)
+				{
+					upperRoom.tileTable[i, 0] = null;
+					roomView.tileTable[i, roomView.height - 1] = upperTile;
+
+					upperTile.posY = roomView.height - 1;
+					upperTile.roomIndex = roomView.index;
+				}
 			}
 		}
 
@@ -331,21 +340,59 @@ public class LevelGenerator : MonoBehaviour
 			Instantiate(BG, BG.transform.position + (Vector3.down * 13 * Mathf.Floor(roomCount / 3f)), Quaternion.identity);
 	}
 
-	public void SetTileToPos(TileView tileView)
+	public bool SetTileToPos(TileView tileView, int otherY, int otherRoomIndex)
 	{
-		int x = (int)tileView.transform.position.x;
-		int y = (int)tileView.transform.position.y;
+		int x = tileView.posX;
+		int y = otherY + 1;
 
-		for (int i = 0; i < rooms.Count; i++)
 		{
-			if (y >= rooms[i].startY)
+			if (y > 4)
 			{
-				var yOff = y - rooms[i].startY;
-				if (yOff >= rooms[i].startY + rooms[i].height)return;
+				otherRoomIndex -= 1;
 
-				rooms[i].tileTable[x, yOff] = tileView;
+				y = y - 4;
+
+				if (otherRoomIndex < 0)
+				{
+					tileView.Destroy();
+					return true;
+				}
+			}
+
+			rooms[otherRoomIndex].tileTable[x, y] = tileView;
+			tileView.posX = x;
+			tileView.posY = y;
+			tileView.roomIndex = otherRoomIndex;
+		}
+
+		return false;
+	}
+
+	public void ClearTileToPos(TileView tileView)
+	{
+		int x = tileView.posX;
+		int y = tileView.posY;
+
+		if (y == 0)
+		{
+			y = 4;
+			tileView.roomIndex += 1;
+		}
+
+		if (y > 4)
+		{
+			tileView.roomIndex -= 1;
+
+			y = y - 4;
+
+			if (tileView.roomIndex < 0)
+			{
+				tileView.Destroy();
+				return;
 			}
 		}
+
+		rooms[tileView.roomIndex].tileTable[tileView.posX, y] = null;
 	}
 
 	int roomCount = 0;
@@ -354,5 +401,33 @@ public class LevelGenerator : MonoBehaviour
 	#region private interface
 	#endregion
 	#region events
+#if UNITY_EDITOR
+	// void OnDrawGizmos()
+	// {
+	// 	if (rooms == null ||  rooms.Count == 0)
+	// 		return;
+
+	// 	for (int r = 0; r < 3; r++)
+	// 	{
+	// 		var room1 = rooms[r];
+
+	// 		for (int x = 0; x < room1.width; x++)
+	// 		{
+	// 			for (int y = 1; y < room1.height; y++)
+	// 			{
+	// 				Gizmos.color = Color.white;
+	// 				if (room1.tileTable[x, y] == null)
+	// 					Gizmos.color = Color.red;
+
+	// 				Gizmos.DrawCube(new Vector3(x + 0.5f, -r * 4 + y + 0.5f, 2), Vector3.one);
+
+	// 				UnityEditor.Handles.color = Color.black;
+	// 				Gizmos.color = Color.black;
+	// 				UnityEditor.Handles.Label(new Vector3(x + 0.1f, y + 0.5f, 0), x + ":" + y);
+	// 			}
+	// 		}
+	// 	}
+	// }
+#endif
 	#endregion
 }

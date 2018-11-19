@@ -65,7 +65,13 @@ MonoBehaviour:
     repeatTimeout: 0
     type: 1
     repeatTimer: 0
-  - name: 2 Music
+  - name: 2 Statue crash
+    source: {fileID: 82073844354251050, guid: 8cff41a8e29264a8fa0309abfb17f61e, type: 2}
+    sourceAmount: 5
+    repeatTimeout: 0
+    type: 1
+    repeatTimer: 0
+  - name: 3 Music
     source: {fileID: 82073844354251050, guid: 8cff41a8e29264a8fa0309abfb17f61e, type: 2}
     sourceAmount: 1
     repeatTimeout: 0
@@ -88,9 +94,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d2719cc7e3b88401b906c01641428a11, type: 3}
   AudioMixerGroup: {fileID: 243181559558686926, guid: 4b0a16cc95c8c42178042ed6f11ce6f9,
     type: 2}
-  channel: 2
+  channel: 3
   loop: 1
   panning: 0
   useCustomPitch: 0
   pitch: {x: 1, y: 1}
   play2DAtStart: 1
+  playOnlyCloseToPlayerHack: 0

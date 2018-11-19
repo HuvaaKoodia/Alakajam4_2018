@@ -16,7 +16,7 @@ TagManager:
   - Tile
   - 
   - Player
-  - 
+  - Statue
   - 
   - 
   - 
@@ -43,4 +43,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1247904149
+    locked: 0
+  - name: Dust
+    uniqueID: 1651105043
     locked: 0
