@@ -19,6 +19,11 @@ void Update()
 	{
 		GotoMainScene();
 	}
+	
+	if (Input.GetButtonDown("BackToMenu"))
+	{
+		Application.Quit();
+	}
 }	
 #endregion
 #region public interface
